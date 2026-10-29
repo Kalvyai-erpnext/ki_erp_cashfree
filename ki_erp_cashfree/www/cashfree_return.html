@@ -1,0 +1,38 @@
+{% extends "templates/web.html" %}
+
+{% block title %}{{ _("Payment") }}{% endblock %}
+
+{%- block header -%}{% endblock %}
+
+{%- block page_content -%}
+<div class="cashfree-return text-center">
+	{% if status == "Failed" %}
+		<h3>{{ _("Payment not completed") }}</h3>
+		<p class="text-muted">{{ message or _("Your payment failed or was cancelled. No money was taken.") }}</p>
+		<a class="btn btn-primary" href="{{ retry_url }}">{{ _("Try Again") }}</a>
+	{% elif status == "Pending" %}
+		<h3>{{ _("Payment is being processed") }}</h3>
+		<p class="text-muted">{{ _("We haven't received the confirmation from your bank yet. This page refreshes on its own; you can also close it, we'll update your order once the payment is confirmed.") }}</p>
+	{% else %}
+		<h3>{{ _("Payment unavailable") }}</h3>
+		<p class="text-muted">{{ message }}</p>
+	{% endif %}
+</div>
+{% endblock %}
+
+{% block script %}
+{% if status == "Pending" %}
+<script>
+	setTimeout(() => window.location.reload(), 10000);
+</script>
+{% endif %}
+{% endblock %}
+
+{% block style %}
+<style>
+	.cashfree-return {
+		max-width: 480px;
+		margin: 80px auto;
+	}
+</style>
+{% endblock %}

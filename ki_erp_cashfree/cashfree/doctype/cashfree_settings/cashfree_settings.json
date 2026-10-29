@@ -1,0 +1,115 @@
+{
+ "actions": [],
+ "creation": "2026-10-23 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "credentials_section",
+  "environment",
+  "app_id",
+  "secret_key",
+  "column_break_credentials",
+  "credentials_help",
+  "checkout_section",
+  "default_phone",
+  "webhook_section",
+  "webhook_url",
+  "webhook_help"
+ ],
+ "fields": [
+  {
+   "fieldname": "credentials_section",
+   "fieldtype": "Section Break",
+   "label": "Credentials"
+  },
+  {
+   "default": "Sandbox",
+   "description": "Use Sandbox with test credentials, Production with live credentials.",
+   "fieldname": "environment",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Environment",
+   "options": "Sandbox\nProduction",
+   "reqd": 1
+  },
+  {
+   "fieldname": "app_id",
+   "fieldtype": "Data",
+   "label": "App ID",
+   "reqd": 1
+  },
+  {
+   "fieldname": "secret_key",
+   "fieldtype": "Password",
+   "label": "Secret Key",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_credentials",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "credentials_help",
+   "fieldtype": "HTML",
+   "options": "<p class=\"text-muted small\">Find the App ID and Secret Key in the Cashfree dashboard under <b>Developers → API Keys</b>. Sandbox and Production have different keys.</p><p class=\"text-muted small\">Saving checks the keys with Cashfree and creates the <b>Cashfree</b> Payment Gateway Account for your default company.</p>"
+  },
+  {
+   "fieldname": "checkout_section",
+   "fieldtype": "Section Break",
+   "label": "Checkout"
+  },
+  {
+   "description": "Cashfree needs a mobile number for every payment. This number is used when the customer has none (Payment Request, contact on the order or invoice, or Customer).",
+   "fieldname": "default_phone",
+   "fieldtype": "Data",
+   "label": "Fallback Customer Mobile",
+   "options": "Phone"
+  },
+  {
+   "fieldname": "webhook_section",
+   "fieldtype": "Section Break",
+   "label": "Webhook"
+  },
+  {
+   "fieldname": "webhook_url",
+   "fieldtype": "Data",
+   "label": "Webhook URL",
+   "read_only": 1
+  },
+  {
+   "fieldname": "webhook_help",
+   "fieldtype": "HTML",
+   "options": "<p class=\"text-muted small\">Add this URL in the Cashfree dashboard under <b>Developers → Webhooks</b> (Payment events). Cashfree only calls HTTPS addresses; without webhooks, payments are still checked when the customer returns and every hour.</p>"
+  }
+ ],
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-10-23 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Cashfree",
+ "name": "Cashfree Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "role": "Accounts Manager",
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

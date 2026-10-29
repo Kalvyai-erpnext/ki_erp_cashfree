@@ -1,0 +1,58 @@
+{% extends "templates/web.html" %}
+
+{% block title %}{{ _("Payment") }}{% endblock %}
+
+{%- block header -%}{% endblock %}
+
+{%- block page_content -%}
+<div class="cashfree-checkout text-center">
+	{% if status == "ready" %}
+		{% if title %}<h3>{{ title }}</h3>{% endif %}
+		{% if description %}<p class="text-muted">{{ description }}</p>{% endif %}
+		<p class="lead">{{ frappe.format(amount, {"fieldtype": "Currency", "options": currency}) }}</p>
+		<p class="cashfree-status text-muted">{{ _("Opening Cashfree checkout...") }}</p>
+		<button class="btn btn-primary cashfree-pay hidden">{{ _("Pay Now") }}</button>
+	{% else %}
+		<h3>{{ _("Payment unavailable") }}</h3>
+		<p class="text-muted">{{ message }}</p>
+	{% endif %}
+</div>
+{% endblock %}
+
+{% block script %}
+{% if status == "ready" %}
+<script src="{{ sdk_url }}"></script>
+<script>
+	(function () {
+		const status = document.querySelector(".cashfree-status");
+		const button = document.querySelector(".cashfree-pay");
+
+		function openCheckout() {
+			button.classList.add("hidden");
+			status.textContent = {{ _("Opening Cashfree checkout...") | tojson }};
+			const cashfree = Cashfree({ mode: {{ mode | tojson }} });
+			cashfree
+				.checkout({ paymentSessionId: {{ payment_session_id | tojson }}, redirectTarget: "_self" })
+				.then((result) => {
+					if (result && result.error) {
+						status.textContent = result.error.message || {{ _("Cashfree could not open the checkout.") | tojson }};
+						button.classList.remove("hidden");
+					}
+				});
+		}
+
+		button.addEventListener("click", openCheckout);
+		openCheckout();
+	})();
+</script>
+{% endif %}
+{% endblock %}
+
+{% block style %}
+<style>
+	.cashfree-checkout {
+		max-width: 480px;
+		margin: 80px auto;
+	}
+</style>
+{% endblock %}
