@@ -12,6 +12,7 @@
   "credentials_help",
   "checkout_section",
   "default_phone",
+  "webshop_pay_button",
   "webhook_section",
   "webhook_url",
   "webhook_help"
@@ -66,6 +67,13 @@
    "options": "Phone"
   },
   {
+   "default": "1",
+   "description": "On the customer's order page of the Webshop, <i>Pay</i> opens the Cashfree checkout, even when the Webshop checkout uses another gateway (e.g. Cash on Delivery).",
+   "fieldname": "webshop_pay_button",
+   "fieldtype": "Check",
+   "label": "Use Cashfree for the Webshop Pay Button"
+  },
+  {
    "fieldname": "webhook_section",
    "fieldtype": "Section Break",
    "label": "Webhook"
@@ -84,7 +92,7 @@
  ],
  "issingle": 1,
  "links": [],
- "modified": "2026-10-23 12:00:00.000000",
+ "modified": "2026-10-29 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Cashfree",
  "name": "Cashfree Settings",

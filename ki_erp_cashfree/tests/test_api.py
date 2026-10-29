@@ -129,10 +129,32 @@ class TestWebshopPayButton(CashfreeTestCase):
 			self.click_pay(so)
 		self.assertFalse(frappe.db.exists("Payment Request", {"reference_name": so.name}))
 
-	def test_other_calls_go_to_erpnext(self):
-		with patch("ki_erp_cashfree.api.erpnext_make_payment_request") as erpnext_method:
+	def test_other_calls_go_on_unchanged(self):
+		with patch("ki_erp_cashfree.api.get_next_make_payment_request") as get_next:
 			api.make_payment_request(dt="Sales Order", dn="SO-1", payment_gateway_account="Any")
-		erpnext_method.assert_called_once_with(dt="Sales Order", dn="SO-1", payment_gateway_account="Any")
+		get_next.return_value.assert_called_once_with(
+			dt="Sales Order", dn="SO-1", payment_gateway_account="Any"
+		)
+
+	def test_pay_button_can_be_left_to_another_gateway(self):
+		frappe.db.set_single_value("Cashfree Settings", "webshop_pay_button", 0)
+		try:
+			with patch("ki_erp_cashfree.api.get_next_make_payment_request") as get_next:
+				api.make_payment_request(dt="Sales Order", dn="SO-1", order_type="Shopping Cart")
+			get_next.return_value.assert_called_once()
+		finally:
+			frappe.db.set_single_value("Cashfree Settings", "webshop_pay_button", 1)
+
+	def test_next_override(self):
+		other = "other_app.api.make_payment_request"
+		hooks = {api.MAKE_PAYMENT_REQUEST: [other, "ki_erp_cashfree.api.make_payment_request"]}
+		with (
+			patch("frappe.get_hooks", return_value=hooks),
+			patch("frappe.get_attr", side_effect=lambda method: method),
+		):
+			self.assertEqual(api.get_next_make_payment_request(), other)
+		with patch("frappe.get_hooks", return_value={}):
+			self.assertIs(api.get_next_make_payment_request(), api.erpnext_make_payment_request)
 
 
 class TestCheckPaymentStatus(CashfreeTestCase):

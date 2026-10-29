@@ -48,7 +48,13 @@ class CashfreeTestCase(IntegrationTestCase):
 		super().setUpClass()
 		settings = frappe.get_single("Cashfree Settings")
 		settings.update(
-			{"environment": "Sandbox", "app_id": "TEST_APP", "secret_key": SECRET_KEY, "default_phone": ""}
+			{
+				"environment": "Sandbox",
+				"app_id": "TEST_APP",
+				"secret_key": SECRET_KEY,
+				"default_phone": "",
+				"webshop_pay_button": 1,
+			}
 		)
 		settings.flags.ignore_mandatory = True  # skips the credential check with Cashfree
 		settings.save()

@@ -16,6 +16,7 @@ from ki_erp_cashfree.processing import (
 )
 
 WEBSHOP_PAYABLE_DOCTYPES = ("Sales Order", "Sales Invoice")
+MAKE_PAYMENT_REQUEST = "erpnext.accounts.doctype.payment_request.payment_request.make_payment_request"
 
 
 @frappe.whitelist(allow_guest=True, methods=["POST"])
@@ -104,11 +105,13 @@ def make_payment_request(**args):
 	Webshop's Pay button calls it with `order_type="Shopping Cart"`: the customer then pays with
 	Cashfree, whatever the Webshop checkout uses otherwise (e.g. Cash on Delivery). ERPNext v16 only
 	lets users who can create Payment Requests call it, which shuts out website customers, so their
-	access to the order is checked here instead. Every other call goes to ERPNext unchanged.
+	access to the order is checked here instead. Every other call goes on unchanged.
 	"""
 	args = frappe._dict(args)
-	if args.order_type != "Shopping Cart":
-		return erpnext_make_payment_request(**args)
+	if args.order_type != "Shopping Cart" or not frappe.db.get_single_value(
+		"Cashfree Settings", "webshop_pay_button"
+	):
+		return get_next_make_payment_request()(**args)
 
 	if args.dt not in WEBSHOP_PAYABLE_DOCTYPES or not isinstance(args.dn, str):
 		frappe.throw(_("Online payment is only available for orders and invoices."))
@@ -135,3 +138,12 @@ def make_payment_request(**args):
 			loyalty_points=args.loyalty_points,
 			return_doc=args.return_doc,
 		)
+
+
+def get_next_make_payment_request():
+	"""Return the `make_payment_request` that applies when Cashfree doesn't handle the call: another
+	app's override (e.g. another gateway's Pay button) if there is one, else ERPNext's own."""
+	ours = f"{__name__}.make_payment_request"
+	overrides = frappe.get_hooks("override_whitelisted_methods", {}).get(MAKE_PAYMENT_REQUEST, [])
+	others = [method for method in overrides if method != ours]
+	return frappe.get_attr(others[-1]) if others else erpnext_make_payment_request
